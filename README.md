@@ -137,3 +137,68 @@ Data Science Intern
 AnalystLab Africa Experience Lab - HealthConnect Project
 
 #AnalystLabAfrica
+
+## Week 5: Data Preparation, Feature Engineering & Baseline Model
+
+Week 5 moved from problem definition into practical implementation:
+preparing the modelling dataset, engineering new features, and
+building an initial baseline classification model.
+
+### Data Preparation
+
+- Confirmed the Week 4 target variable and cancellation-handling
+  decision (unchanged).
+- Corrected the reasoning behind excluding `waiting_time_minutes`:
+  empirical testing showed it has virtually identical distributions
+  across No-Show and Attended groups, so it is a non-informative
+  feature rather than a data leakage risk as originally assumed.
+- Handled missing values (`reminder_channel` → "None" category,
+  `distance_to_clinic_km` → median imputation) and one-hot encoded all
+  categorical variables.
+
+### Key EDA Findings
+
+| Relationship | Finding |
+|---|---|
+| Booking lead time vs no-show | No-show rate rises from 29.5% (short lead time) to 63.9% (long lead time) — the strongest pattern found |
+| Reminder sent vs no-show | 49.9% no-show rate with a reminder vs 54.6% without |
+| Prior no-shows vs no-show | Mean prior no-show rate of 0.191 for No-Show vs 0.146 for Attended |
+
+### Engineered Features
+
+- `prior_no_show_rate` — previous no-shows as a proportion of previous appointments
+- `booking_lead_category` — Short/Medium/Long grouping of booking lead time
+- `has_prior_history` — flags first-time vs returning patients
+
+### Train/Test Strategy
+
+A **patient-aware** split (`GroupShuffleSplit`, grouped by `patient_id`)
+was used instead of a standard row-level split, since many patients
+appear multiple times in the dataset. Verified zero patient overlap
+between the training and test sets.
+
+### Baseline Model & Results
+
+**Model:** Logistic Regression (chosen for interpretability as a first
+benchmark)
+
+| Metric | Score |
+|---|---|
+| Accuracy | 0.631 |
+| Precision (No-Show) | 0.62 |
+| Recall (No-Show) | 0.66 |
+| F1-score (No-Show) | 0.64 |
+| ROC-AUC | 0.677 |
+
+The baseline performs meaningfully better than random guessing and
+correctly identifies about two-thirds of genuine no-shows, providing a
+usable first benchmark for HealthConnect Clinic.
+
+**Notebook:** [`Week_5/notebooks/AnalystLab_Africa_week5_healthconnect.ipynb`](./Week_5/notebooks/AnalystLab_Africa_week5_healthconnect.ipynb)
+**Project Summary:** [`Week_5/reports/Week_5_Project_Summary.pdf`](./Week_5/reports/Week_5_Project_Summary.pdf)
+
+### Proposed Focus for Week 6
+
+Test tree-based models (Random Forest, Gradient Boosting) against the
+Logistic Regression baseline, perform hyperparameter tuning, examine
+feature importance, and consider classification threshold adjustments.
