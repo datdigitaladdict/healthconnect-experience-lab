@@ -202,3 +202,74 @@ usable first benchmark for HealthConnect Clinic.
 Test tree-based models (Random Forest, Gradient Boosting) against the
 Logistic Regression baseline, perform hyperparameter tuning, examine
 feature importance, and consider classification threshold adjustments.
+
+## Week 6: Model Improvement, Error Analysis & Validation
+
+Week 6 moved from establishing a baseline into improving it through
+error analysis, cross-track integration, and model comparison.
+
+### Error Analysis
+
+Profiled the Week 5 baseline's false negatives and false positives
+separately:
+
+- **False negatives (164):** patients with short booking lead time
+  (mean 19.1 days) and low prior no-show rate (0.117) who no-showed
+  anyway — the model's blind spot, patients who "look safe" but aren't.
+- **False positives (192):** patients with long lead time (mean 38.8
+  days) and prior history (98.4%) who were wrongly flagged — the model
+  over-relies on these two signals.
+
+### Cross-Track Integration
+
+**Collaborated with:** Data Analytics track.
+
+**Received:** A validated no-show rate breakdown by booking lead time,
+using four ranges instead of the three used in Week 5:
+
+| Lead Time Range | No-Show Rate |
+|---|---|
+| 0–7 days | 29.47% |
+| 8–14 days | 35.19% |
+| 15–30 days | 45.53% |
+| 31–60 days | 63.95% |
+
+**Integration activity:** Refined `booking_lead_category` from 3 bins
+to 4 using these validated boundaries. Independently recalculated
+rates in this notebook matched the shared finding exactly, providing
+mutual cross-track validation.
+
+**Provided in return:** The strongest predictors from the Week 5
+baseline (booking lead time, prior no-show history, reminder status),
+shared to inform the collaborator's own analytical focus.
+
+### Model Comparison
+
+| Model | Accuracy | Precision | Recall | F1-score | ROC-AUC |
+|---|---|---|---|---|---|
+| Week 5 Baseline (LR, 3-bin) | 0.631 | 0.624 | 0.660 | 0.642 | 0.677 |
+| Refined LR (4-bin) | 0.631 | 0.624 | 0.660 | 0.642 | 0.677 |
+| Random Forest (4-bin) | 0.636 | 0.633 | 0.646 | 0.639 | 0.680 |
+
+**Finding:** Neither the feature refinement nor Random Forest produced
+a large improvement — an honest result suggesting the current feature
+set is near its practical ceiling for this modelling approach.
+
+### Final Candidate Model
+
+**Selected:** Refined Logistic Regression (4-bin feature).
+
+**Why:** Matches the Week 5 baseline's recall (0.660) exactly, the
+priority metric for HealthConnect's use case (missing a no-show wastes
+a slot; a false alarm only costs an extra reminder), while using a
+cross-track-validated feature and remaining fully interpretable.
+
+**Notebook:** [`Week_6/notebooks/HealthConnect Clinic Experience Lab Week 6.ipynb`](./Week_6/notebooks/HealthConnect Clinic Experience Lab Week 6(1).ipynb)
+**Project Summary:** [`Week_6/reports/Week_6_Project_Summary.pdf`](./Week_6/reports/Week_6_Project_Summary.pdf)
+
+### Proposed Focus for Week 7
+
+Patient-aware cross-validation, Random Forest hyperparameter tuning,
+feature importance review, classification threshold testing, and
+validating the candidate model's input/output interface with the ML
+Engineering track ahead of pipeline integration.
