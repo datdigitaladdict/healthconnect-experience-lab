@@ -273,3 +273,70 @@ Patient-aware cross-validation, Random Forest hyperparameter tuning,
 feature importance review, classification threshold testing, and
 validating the candidate model's input/output interface with the ML
 Engineering track ahead of pipeline integration.
+
+## Week 7: Model Testing, Error Analysis & Refinement
+
+Week 7 moved from Week 6's model comparison into systematic testing —
+going beyond aggregate metrics to find out where the candidate model
+actually succeeds and fails.
+
+### Key Finding: Aggregate Metrics Were Hiding a Serious Weakness
+
+Segment-level testing by booking lead time revealed a severe recall
+imbalance that Week 6's overall numbers didn't show:
+
+| Segment | Accuracy | Recall |
+|---|---|---|
+| 0–7 days | 0.726 | 0.061 |
+| 8–14 days | 0.717 | 0.161 |
+| 15–30 days | 0.557 | 0.336 |
+| 31+ days | 0.631 | 0.907 |
+
+The model's overall 66% recall is almost entirely earned from
+long-lead-time appointments. For short-notice appointments, arguably
+the hardest for the clinic to backfill, the model provides almost no
+early-warning value.
+
+### Overfitting Check
+
+Training and test performance were nearly identical (accuracy 0.635
+vs 0.631, recall 0.660 vs 0.660), ruling out overfitting. This pointed
+toward underfitting in the short-lead-time segment instead, the model
+simply isn't capturing enough signal there.
+
+### Cross-Track Testing: Data Analytics Collaboration
+
+**Received:** A validated finding from the Data Analytics track
+showing the booking-lead-time no-show pattern holds even when
+reminder status is considered, with reminders associated with lower
+no-show rates within every lead-time group.
+
+**Test performed:** Engineered an interaction feature combining
+booking lead time and reminder status, then retrained and re-tested
+the model.
+
+**Result - a validated negative finding:** The interaction feature
+produced no meaningful change in segment-level recall (0-7 day recall
+unchanged at 6.1%). This ruled out a plausible hypothesis with
+evidence, rather than assumption, and clarified that the real
+bottleneck is Logistic Regression's linear structure, not the feature
+encoding.
+
+**Provided in return:** The full test outcome shared back with the
+collaborator for her own Week 7 documentation.
+
+### Suitability Assessment
+
+The candidate model is suitable for a segmented use case (flagging
+long-lead-time appointments) but not yet a general-purpose predictor
+across all booking timeframes.
+
+**Notebook:** [`Week_7/notebooks/HealthConnect Clinic Experience Lab Week 7.ipynb`](./Week_7/notebooks/HealthConnect Clinic Experience Lab Week 7.ipynb)
+**Project Summary:** [`Week_7/reports/Week_7_Project_Summary.pdf`](./Week_7/reports/Week_7_Project_Summary.pdf)
+
+### What Must Be Completed Before Week 8
+
+- Test a properly tuned Random Forest to see if a non-linear model
+  closes the short-lead-time recall gap
+- Test a segment-specific classification threshold
+- Run patient-aware cross-validation to confirm these findings are stable
