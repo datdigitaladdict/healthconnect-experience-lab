@@ -340,3 +340,73 @@ across all booking timeframes.
   closes the short-lead-time recall gap
 - Test a segment-specific classification threshold
 - Run patient-aware cross-validation to confirm these findings are stable
+
+## Week 8: Final Model Selection, Documentation & Presentation
+
+Week 8 closed out the HealthConnect Experience Lab by finalizing the
+candidate model, documenting its business suitability, and preparing
+final presentation materials.
+
+### Final Candidate Model
+
+**Logistic Regression**, using `booking_lead_category_v2` (4-bin,
+cross-track validated) and `reminder_sent` as separate features (an
+interaction version was tested in Week 7 and rejected after evidence
+showed no improvement).
+
+| Metric | Score |
+|---|---|
+| Accuracy | 0.631 |
+| Precision | 0.624 |
+| Recall | 0.660 |
+| F1-score | 0.642 |
+| ROC-AUC | 0.677 |
+
+### What This Model Can and Cannot Be Used For
+
+**Can be used for:** Flagging no-show risk for appointments booked 31+
+days in advance, where the model catches 91% of genuine no-shows.
+HealthConnect could use this today to prioritize reminder outreach for
+long-notice patients.
+
+**Cannot currently be used for:** Reliably predicting no-shows for
+short-notice appointments (0-7 days), where recall drops to just 6%.
+A cross-track-validated fix (an interaction feature combining booking
+lead time and reminder status) was tested in Week 7 and did not
+resolve this. Deploying the model without this caveat would give
+HealthConnect false confidence in short-notice risk coverage.
+
+### Project Journey Summary
+
+| Week | Milestone |
+|---|---|
+| 4 | Defined the ML problem: binary no-show classification, cancellations excluded |
+| 5 | Built the baseline Logistic Regression model (66% recall) |
+| 6 | Tested feature refinement (cross-track validated) and Random Forest; neither improved aggregate performance |
+| 7 | Discovered severe segment-level recall imbalance hidden by aggregate metrics; tested and ruled out an interaction-feature fix |
+| 8 | Finalized the model, documented its scoped suitability, and prepared final presentation materials |
+
+### Cross-Track Collaboration (Full Project)
+
+The most sustained and productive collaboration throughout this
+project was with the **Data Analytics track**, which included two
+independently-validated exchanges (Week 6: booking lead time
+breakdown; Week 7: booking lead time × reminder status breakdown),
+both of which directly shaped feature engineering decisions and were
+each verified to match exactly when recalculated independently.
+
+**Notebook:** [`Week_8/notebooks/HealthConnect Clinic Experience Lab Week 8.ipynb`](./Week_8/notebooks/HealthConnect Clinic Experience Lab Week 8.ipynb)
+**Project Summary:** [`Week_8/reports/Week_8_Project_Summary.pdf`](./Week_8/reports/Week_8_Project_Summary.pdf)
+
+### Final Limitations
+
+- Severe recall imbalance by booking lead time segment remains unresolved
+- No hyperparameter tuning or cross-validation was performed at any stage
+- Synthetic data; real-world generalization unverified
+- The requirements handoff to ML Engineering was documented but not
+  confirmed through an actioned two-way exchange
+
+### Project Status: Complete
+
+This concludes the Data Science track's contribution to the
+HealthConnect Experience Lab (Weeks 4-8).
